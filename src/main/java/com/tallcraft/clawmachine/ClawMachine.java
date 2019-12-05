@@ -7,7 +7,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -37,10 +37,10 @@ public final class ClawMachine extends JavaPlugin implements Listener {
 
         String safeWorldName = config.getString("safeDestinationWorld");
 
-        World safeWorld = Bukkit.getServer().getWorld(safeWorldName);
+        safeWorld = Bukkit.getServer().getWorld(safeWorldName);
         if(safeWorld == null) {
-            throw new Error("Invalid safeDestinationWorld '" + safeWorldName + "'!");
-            // TODO: do we need to disable ourselves?
+            getLogger().warning("Invalid safeDestinationWorld '" + safeWorldName + "'!");
+            Bukkit.getPluginManager().disablePlugin(this);
         }
 
         getServer().getPluginManager().registerEvents(this, this);
@@ -48,7 +48,7 @@ public final class ClawMachine extends JavaPlugin implements Listener {
 
 
     @EventHandler
-    public void onPlayerLoginEvent(PlayerLoginEvent event) {
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         boolean isUnsafe = config.getStringList("unsafeWorlds").contains(player.getWorld().getName());
 
@@ -56,6 +56,7 @@ public final class ClawMachine extends JavaPlugin implements Listener {
             return;
         }
 
+        // TODO: teleport msg from config
         player.teleport(safeWorld.getSpawnLocation());
     }
 
