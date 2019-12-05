@@ -1,0 +1,8 @@
+name: ClawMachine
+version: ${project.version}
+main: com.tallcraft.clawmachine.ClawMachine
+api-version: 1.13
+prefix: ClawMachine
+authors: [Tallcraft]
+description: Rescue players from unsafe worlds on login.
+website: https://tallcraft.com
