@@ -6,3 +6,5 @@ prefix: ClawMachine
 authors: [Tallcraft]
 description: Rescue players from unsafe worlds on login.
 website: https://tallcraft.com
+softdepend:
+  - Multiverse-Core
