@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ public final class ClawMachine extends JavaPlugin implements Listener {
 
     private FileConfiguration config;
     private World safeWorld;
+    private boolean listenLogin;
+    private boolean listenRespawn;
 
     private void initConfig() {
         config = this.getConfig();
@@ -26,8 +29,10 @@ public final class ClawMachine extends JavaPlugin implements Listener {
 
         defaultConfig.set("unsafeWorlds", new ArrayList<>());
         defaultConfig.set("safeDestinationWorld", "world");
+        defaultConfig.set("teleportOnLogin", true);
+        defaultConfig.set("teleportOnRespawn", true);
         defaultConfig.set("teleportMsg", "&6You have left &9{{UnsafeWorldName}}&6.");
-        defaultConfig.set("unsafeWorldEnterMsg", "&6You are entering &9{{UnsafeWorldName}}&6. Please note that you will automatically leave this world on logout.");
+        defaultConfig.set("unsafeWorldEnterMsg", "&6You are entering &9{{UnsafeWorldName}}&6. Please note that you will automatically leave this world on logout or death.");
 
         config.setDefaults(defaultConfig);
         config.options().copyDefaults(true);
@@ -51,6 +56,9 @@ public final class ClawMachine extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().disablePlugin(this);
         }
 
+        listenLogin = config.getBoolean("teleportOnLogin");
+        listenRespawn = config.getBoolean("teleportOnRespawn");
+
         getServer().getPluginManager().registerEvents(this, this);
     }
 
@@ -69,10 +77,7 @@ public final class ClawMachine extends JavaPlugin implements Listener {
         }
     }
 
-
-    @EventHandler
-    public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+    private void maybeTeleportPlayer(Player player) {
         String currentWorldName = player.getWorld().getName();
         boolean isUnsafe = config.getStringList("unsafeWorlds").contains(currentWorldName);
 
@@ -92,4 +97,20 @@ public final class ClawMachine extends JavaPlugin implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
+        if (!listenRespawn) {
+            return;
+        }
+        maybeTeleportPlayer(event.getPlayer());
+    }
+
+
+    @EventHandler
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        if (!listenLogin) {
+            return;
+        }
+        maybeTeleportPlayer(event.getPlayer());
+    }
 }
