@@ -1,5 +1,6 @@
 package com.tallcraft.clawmachine;
 
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -91,7 +92,7 @@ public final class ClawMachine extends JavaPlugin implements Listener {
             msg = configMsg.replace("{{UnsafeWorldName}}", currentWorldName);
             msg = ChatColor.translateAlternateColorCodes('&', msg);
         }
-        player.teleport(safeWorld.getSpawnLocation());
+        PaperLib.teleportAsync(player, safeWorld.getSpawnLocation());
         if (msg != null) {
             player.sendMessage(msg);
         }
